@@ -1,22 +1,8 @@
-const { celebrate, Joi } = require('celebrate');
-Joi.objectId = require('joi-objectid')(Joi);
-const router = require('express').Router();
-const {
-  getUser,
-  updateUser,
-} = require('../controllers/users');
+const routes = require('express').Router();
+const { getUser, updateUser } = require('../controllers/users');
+const { updateUserValidation } = require('../middlewares/validation');
 
-router.get('/me', getUser);
-router.patch('/me', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    email: Joi.string().required().email(),
-  }),
-}), updateUser);
-router.get('/:userId', celebrate({
-  params: Joi.object().keys({
-    userId: Joi.objectId(),
-  }),
-}), getUser);
+routes.get('/me', getUser);
+routes.patch('/me', updateUserValidation, updateUser);
 
-module.exports.usersRoutes = router;
+module.exports.usersRoutes = routes;

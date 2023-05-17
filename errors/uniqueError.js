@@ -1,7 +1,9 @@
+const { CONFLICT } = require('./constants');
+
 class UniqueError extends Error {
   constructor(message) {
     super(message);
-    this.statusCode = 409;
+    this.statusCode = CONFLICT;
   }
 }
 

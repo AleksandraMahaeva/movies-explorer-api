@@ -5,11 +5,12 @@ const NotFoundError = require('../errors/notFoundError');
 const ValidationError = require('../errors/validationError');
 const UniqueError = require('../errors/uniqueError');
 const AuthorizError = require('../errors/authorizError');
+const { SUCCESS, DUPLICATE_KEY } = require('../errors/constants');
+const { JWT_SECRET } = require('../config');
 
 const notFoundUserMessage = 'Пользователь не найден';
-const { NODE_ENV, JWT_SECRET } = process.env;
+const { NODE_ENV } = process.env;
 const isProduction = NODE_ENV === 'production';
-const key = isProduction ? JWT_SECRET : 'some-secret-key';
 
 module.exports.createUser = (req, res, next) => {
   const {
@@ -24,23 +25,19 @@ module.exports.createUser = (req, res, next) => {
       name, email,
     }))
     .catch((err) => {
-      if (err.code === 11000) next(new UniqueError('Пользаватель с таким Email уже существует'));
+      if (err.code === DUPLICATE_KEY) next(new UniqueError('Пользаватель с таким Email уже существует'));
       else if (err.name === 'ValidationError') next(new ValidationError('Переданы некорректные данные при создании пользователя'));
       else next(err);
     });
 };
 
 module.exports.getUser = (req, res, next) => {
-  const userId = req.params.userId || req.user._id;
-  User.findById(userId)
+  User.findById(req.user._id)
     .then((user) => {
       if (!user) throw new NotFoundError(notFoundUserMessage);
       else res.send(user);
     })
-    .catch((err) => {
-      if (err.name === 'CastError') next(new ValidationError('Передан некорректный id пользователя'));
-      else next(err);
-    });
+    .catch(next);
 };
 
 module.exports.updateUser = (req, res, next) => {
@@ -71,7 +68,7 @@ module.exports.login = (req, res, next) => {
           }
           const token = jwt.sign(
             { _id: user._id },
-            key,
+            JWT_SECRET,
             { expiresIn: '7d' },
           );
           res.cookie('userToken', token, {
@@ -98,7 +95,7 @@ module.exports.logout = (req, res, next) => {
         httpOnly: true,
         sameSite: true,
       })
-      .status(200)
+      .status(SUCCESS)
       .send({ message: 'Вы успешно разовторизовались' });
   } catch (err) {
     next(err);
