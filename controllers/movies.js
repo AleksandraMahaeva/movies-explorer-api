@@ -2,8 +2,13 @@ const Movie = require('../models/movie');
 const NotFoundError = require('../errors/notFoundError');
 const ValidationError = require('../errors/validationError');
 const NoAccessError = require('../errors/noAccessError');
+const { messages } = require('../messages');
 
-const notFoundMovieMessage = 'Фильм не найден';
+const {
+  notFoundMovieMessage,
+  movieValidationMassage,
+  noAccessToDeleteMessage,
+} = messages;
 
 module.exports.createMovie = (req, res, next) => {
   const {
@@ -36,7 +41,7 @@ module.exports.createMovie = (req, res, next) => {
   })
     .then((movie) => res.send(movie))
     .catch((err) => {
-      if (err.name === 'ValidationError') next(new ValidationError('Переданы некорректные данные'));
+      if (err.name === 'ValidationError') next(new ValidationError(movieValidationMassage));
       else next(err);
     });
 };
@@ -50,11 +55,11 @@ module.exports.deleteMovie = (req, res, next) => {
       throw new NotFoundError(notFoundMovieMessage);
     })
     .then((movie) => {
-      if (movie.owner.toString() !== userId) throw new NoAccessError('Нет прав для удаления');
+      if (movie.owner.toString() !== userId) throw new NoAccessError(noAccessToDeleteMessage);
       return Movie.findByIdAndRemove(movieId).then(() => res.send(movie));
     })
     .catch((err) => {
-      if (err.name === 'CastError') next(new ValidationError('Переданы некорректные данные'));
+      if (err.name === 'CastError') next(new ValidationError(movieValidationMassage));
       else next(err);
     });
 };

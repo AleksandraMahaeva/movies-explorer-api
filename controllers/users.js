@@ -7,8 +7,18 @@ const UniqueError = require('../errors/uniqueError');
 const AuthorizError = require('../errors/authorizError');
 const { SUCCESS, DUPLICATE_KEY } = require('../errors/constants');
 const { JWT_SECRET } = require('../config');
+const { messages } = require('../messages');
 
-const notFoundUserMessage = 'Пользователь не найден';
+const {
+  notFoundUserMessage,
+  emailUniqueMessage,
+  userValidationMessage,
+  authValidationMessage,
+  notAuthMessage,
+  loginnSuccessMessage,
+  logoutSuccessMessage,
+} = messages;
+
 const { NODE_ENV } = process.env;
 const isProduction = NODE_ENV === 'production';
 
@@ -25,8 +35,8 @@ module.exports.createUser = (req, res, next) => {
       name, email,
     }))
     .catch((err) => {
-      if (err.code === DUPLICATE_KEY) next(new UniqueError('Пользаватель с таким Email уже существует'));
-      else if (err.name === 'ValidationError') next(new ValidationError('Переданы некорректные данные при создании пользователя'));
+      if (err.code === DUPLICATE_KEY) next(new UniqueError(emailUniqueMessage));
+      else if (err.name === 'ValidationError') next(new ValidationError(userValidationMessage));
       else next(err);
     });
 };
@@ -49,7 +59,8 @@ module.exports.updateUser = (req, res, next) => {
       else res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') next(new ValidationError('Переданы некорректные данные при обновлении профиля'));
+      if (err.code === DUPLICATE_KEY) next(new UniqueError(emailUniqueMessage));
+      else if (err.name === 'ValidationError' || err.name === 'CastError') next(new ValidationError(userValidationMessage));
       else next(err);
     });
 };
@@ -59,12 +70,12 @@ module.exports.login = (req, res, next) => {
 
   User.findOne({ email }).select('+password')
     .then((user) => {
-      if (!user) throw new AuthorizError('Неправильные почта или пароль');
+      if (!user) throw new AuthorizError(authValidationMessage);
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            throw new AuthorizError('Неправильные почта или пароль');
+            throw new AuthorizError(authValidationMessage);
           }
           const token = jwt.sign(
             { _id: user._id },
@@ -76,7 +87,7 @@ module.exports.login = (req, res, next) => {
             httpOnly: true,
             sameSite: false,
             secure: isProduction,
-          }).send({ message: 'Вы успешно авторизовались' });
+          }).send({ message: loginnSuccessMessage });
         });
     })
     .catch(next);
@@ -86,7 +97,7 @@ module.exports.logout = (req, res, next) => {
   const token = req.cookies.userToken;
 
   if (!token) {
-    throw new AuthorizError('Вы не авторизованы в системе');
+    throw new AuthorizError(notAuthMessage);
   }
 
   try {
@@ -96,7 +107,7 @@ module.exports.logout = (req, res, next) => {
         sameSite: true,
       })
       .status(SUCCESS)
-      .send({ message: 'Вы успешно разовторизовались' });
+      .send({ message: logoutSuccessMessage });
   } catch (err) {
     next(err);
   }

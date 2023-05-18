@@ -1,0 +1,15 @@
+module.exports.messages = {
+  notFoundUserMessage: 'Пользователь не найден',
+  emailUniqueMessage: 'Пользаватель с таким Email уже существует',
+  userValidationMessage: 'Переданы некорректные данные пользователя',
+  authValidationMessage: 'Неправильные почта или пароль',
+  notAuthMessage: 'Необходима авторизация',
+  loginnSuccessMessage: 'Вы успешно авторизовались',
+  logoutSuccessMessage: 'Вы успешно paзавторизовались',
+  notFoundMovieMessage: 'Фильм не найден',
+  movieValidationMassage: 'Переданы некорректные данные',
+  noAccessToDeleteMessage: 'Нет прав для удаления',
+  commonErrorMessage: 'Произошла ошибка',
+  urlValidationMessage: 'Заполните поле валидным URL',
+  notFoundUrlMessage: 'Был запрошен несуществующий адрес',
+};

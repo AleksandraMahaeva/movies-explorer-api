@@ -1,18 +1,21 @@
 const { celebrate, Joi } = require('celebrate');
 Joi.objectId = require('joi-objectid')(Joi);
 const { default: validator } = require('validator');
+const { messages } = require('../messages');
+
+const { urlValidationMessage } = messages;
 
 function validateURL(value, helpers) {
   if (validator.isURL(value)) {
     return value;
   }
-  return helpers.message('Заполните поле валидным URL');
+  return helpers.message(urlValidationMessage);
 }
 
 const signUpValidation = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(3),
+    password: Joi.string().required(),
     name: Joi.string().required().min(2).max(30),
   }),
 });
@@ -20,7 +23,7 @@ const signUpValidation = celebrate({
 const signInValidation = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(3),
+    password: Joi.string().required(),
   }),
 });
 
@@ -39,7 +42,7 @@ const createMovieValidation = celebrate({
     year: Joi.string().required(),
     description: Joi.string().required(),
     image: Joi.string().required().custom(validateURL),
-    trailer: Joi.string().required().custom(validateURL),
+    trailerLink: Joi.string().required().custom(validateURL),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
     thumbnail: Joi.string().required().custom(validateURL),
