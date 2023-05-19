@@ -1,0 +1,44 @@
+{
+  "name": "movies-explorer-api",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "celebrate": "^15.0.1",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.7.0",
+    "express-winston": "^4.2.0",
+    "helmet": "^7.0.0",
+    "joi-objectid": "^4.0.2",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.3",
+    "validator": "^13.9.0",
+    "winston": "^3.8.2"
+  },
+  "type": "commonjs",
+  "devDependencies": {
+    "eslint": "^8.38.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "nodemon": "^2.0.22"
+  },
+  "version": "1.0.0",
+  "description": "diplom (backend)",
+  "main": "app.js",
+  "scripts": {
+    "lint": "eslint .",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AleksandraMahaeva/movies-explorer-api.git"
+  },
+  "author": "Aleksandra Mahaeva",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AleksandraMahaeva/movies-explorer-api/issues"
+  },
+  "homepage": "https://github.com/AleksandraMahaeva/movies-explorer-api#readme"
+}
